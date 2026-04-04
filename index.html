@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindful Site</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <p id="text">Want to binge?</p>
+        <button id="btn" onclick="startTimer()">Click Me</button>
+        
+        <div id="timer-section" style="display:none;">
+            <p id="timer">10:00</p>
+            <p id="custom-text">5-4-3-2-1 technique: acknowledge five things you see, four things you can touch, and three things you hear around you. Then, notice two things you can smell and one thing you can taste</p>
+            
+            <div id="input-container">
+                <div class="input-group">
+                    <input type="text" class="technique-input" placeholder="Enter what you see...">
+                    <span class="checkmark">✓</span>
+                </div>
+                <div class="input-group">
+                    <input type="text" class="technique-input" placeholder="Enter what you can touch...">
+                    <span class="checkmark">✓</span>
+                </div>
+                <div class="input-group">
+                    <input type="text" class="technique-input" placeholder="Enter what you hear...">
+                    <span class="checkmark">✓</span>
+                </div>
+                <div class="input-group">
+                    <input type="text" class="technique-input" placeholder="Enter what you can smell...">
+                    <span class="checkmark">✓</span>
+                </div>
+                <div class="input-group">
+                    <input type="text" class="technique-input" placeholder="Enter what you can taste...">
+                    <span class="checkmark">✓</span>
+                </div>
+            </div>
+        </div>
+        
+        <p id="completion-message" style="display:none;">OK!</p>
+    </div>
+
+    <script>
+        const TIMER_DURATION = 600; // 10 minutes in seconds
+        let timeRemaining = TIMER_DURATION;
+        let timerInterval = null;
+
+        function startTimer() {
+            // Hide button and initial text
+            document.getElementById('btn').style.display = 'none';
+            document.getElementById('text').style.display = 'none';
+            
+            // Show timer section
+            document.getElementById('timer-section').style.display = 'block';
+            
+            // Add event listeners to input boxes
+            const inputs = document.querySelectorAll('.technique-input');
+            inputs.forEach((input, index) => {
+                input.addEventListener('input', function() {
+                    toggleCheckmark(index);
+                });
+            });
+            
+            // Start the countdown
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function toggleCheckmark(index) {
+            const inputs = document.querySelectorAll('.technique-input');
+            const checkmarks = document.querySelectorAll('.checkmark');
+            
+            // Word thresholds for each input: [5 words, 4 words, 3 words, 2 words, 1 word]
+            const wordThresholds = [5, 4, 3, 2, 1];
+            
+            // Count words by splitting on commas
+            const text = inputs[index].value.trim();
+            const wordCount = text.length === 0 ? 0 : text.split(',').filter(item => item.trim().length > 0).length;
+            
+            if (wordCount >= wordThresholds[index]) {
+                checkmarks[index].style.display = 'inline';
+            } else {
+                checkmarks[index].style.display = 'none';
+            }
+        }
+
+        function updateTimer() {
+            timeRemaining--;
+            
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            document.getElementById('timer').textContent = 
+                `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                finishTimer();
+            }
+        }
+
+        function finishTimer() {
+            // Clear all input boxes
+            const inputs = document.querySelectorAll('.technique-input');
+            inputs.forEach(input => {
+                input.value = '';
+            });
+            
+            // Hide all checkmarks
+            const checkmarks = document.querySelectorAll('.checkmark');
+            checkmarks.forEach(checkmark => {
+                checkmark.style.display = 'none';
+            });
+            
+            // Hide timer section
+            document.getElementById('timer-section').style.display = 'none';
+            
+            // Show completion message
+            document.getElementById('completion-message').style.display = 'block';
+            
+            // Reset after 2 seconds
+            setTimeout(resetPage, 2000);
+        }
+
+        function resetPage() {
+            // Reset variables
+            timeRemaining = TIMER_DURATION;
+            
+            // Show initial state
+            document.getElementById('text').style.display = 'block';
+            document.getElementById('btn').style.display = 'block';
+            document.getElementById('completion-message').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
